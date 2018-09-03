@@ -28,8 +28,6 @@ public class Instalar
   {
     int retorno = -1;
     try {
-      System.out.println(Inicio.p.getDireccionIP());
-       System.exit(0);
       this.con = DriverManager.getConnection("jdbc:mysql://" + Inicio.p.getDireccionIP() + "/", Inicio.p.getUsuario(), Inicio.p.getPassword());
 
       this.sentencia = this.con.createStatement();

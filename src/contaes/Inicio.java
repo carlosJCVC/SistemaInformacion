@@ -70,6 +70,7 @@ import java.util.Arrays;
    {
      Instalar instalacion = new Instalar();
      int retorno = instalacion.yaInstalado();
+     
      if ((retorno != 1) && (retorno != -2)) {
        int confirma = JOptionPane.showConfirmDialog(new Frame(), Mensajes.getString("instala1"), Mensajes.getString("instala2"), 0);
  
