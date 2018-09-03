@@ -13,6 +13,7 @@
  import java.awt.Frame;
  import java.io.PrintStream;
  import java.util.ArrayList;
+import java.util.Arrays;
  import java.util.Properties;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
@@ -25,204 +26,211 @@
  
  public class Inicio
  {
-/*  52 */   public static Puente p = new Puente();
+   public static Puente p = new Puente();
    public static MarcoInicio frame;
    public static Calculadora calculadora;
    public static JTree arbolPC;
-/*  56 */   private static contaes.manejoDatos.auxiliar.MySQLConection cEmpresa = null;
-/*  57 */   private static contaes.manejoDatos.auxiliar.MySQLConection cFacturacion = null;
-/*  58 */   private static contaes.manejoDatos.auxiliar.MySQLConection cGeneral = null;
-/*  59 */   private static almacen2.data.MySQLConection cAlmacen = null;
+   private static contaes.manejoDatos.auxiliar.MySQLConection cEmpresa = null;
+   private static contaes.manejoDatos.auxiliar.MySQLConection cFacturacion = null;
+   private static contaes.manejoDatos.auxiliar.MySQLConection cGeneral = null;
+   private static almacen2.data.MySQLConection cAlmacen = null;
  
    public Inicio(boolean POS)
    {
      try
      {
-/*  67 */       Class.forName("com.mysql.jdbc.Driver");
+       Class.forName("com.mysql.jdbc.Driver");
      } catch (ClassNotFoundException exc) {
-/*  69 */       JOptionPane.showMessageDialog(new JFrame(), "¡Error al registrar el controlador para MySQL!", "Error", 0);
+       JOptionPane.showMessageDialog(new JFrame(), "¡Error al registrar el controlador para MySQL!", "Error", 0);
  
-/*  71 */       System.exit(1);
+       System.exit(1);
      }
  
-/*  74 */     p.setModoPOS(POS);
+     p.setModoPOS(POS);
  
-/*  76 */     System.setProperty("apple.laf.useScreenMenuBar", "true");
+     System.setProperty("apple.laf.useScreenMenuBar", "false");
  
-/*  78 */     UsuariosJDialog.seleccionDeUsuario(POS);
-/*  79 */     comprobarInstalacion();
+     UsuariosJDialog.seleccionDeUsuario(POS);
+     comprobarInstalacion();
  
-/*  81 */     cGeneral = new contaes.manejoDatos.auxiliar.MySQLConection();
-/*  82 */     cAlmacen = new almacen2.data.MySQLConection();
-/*  83 */     crearArbolPGC();
-/*  84 */     checkVersion();
-/*  85 */     p.setRegistro(Registro.isRegistrado());
-/*  86 */     frame = new MarcoInicio();
-/*  87 */     calculadora = new Calculadora();
-/*  88 */     calculadora.validate();
-/*  89 */     frame.validate();
-/*  90 */     frame.setVisible(true);
-/*  91 */     frame.colocarInfo();
+     cGeneral = new contaes.manejoDatos.auxiliar.MySQLConection();
+     cAlmacen = new almacen2.data.MySQLConection();
+     crearArbolPGC();
+     checkVersion();
+     p.setRegistro(Registro.isRegistrado());
+     frame = new MarcoInicio();
+     calculadora = new Calculadora();
+     calculadora.validate();
+     frame.validate();
+     frame.setVisible(true);
+     frame.colocarInfo();
    }
  
    private void comprobarInstalacion()
    {
-/* 101 */     Instalar instalacion = new Instalar();
-/* 102 */     int retorno = instalacion.yaInstalado();
-/* 103 */     if ((retorno != 1) && (retorno != -2)) {
-/* 104 */       int confirma = JOptionPane.showConfirmDialog(new Frame(), Mensajes.getString("instala1"), Mensajes.getString("instala2"), 0);
+     Instalar instalacion = new Instalar();
+     int retorno = instalacion.yaInstalado();
+     if ((retorno != 1) && (retorno != -2)) {
+       int confirma = JOptionPane.showConfirmDialog(new Frame(), Mensajes.getString("instala1"), Mensajes.getString("instala2"), 0);
  
-/* 107 */       if (confirma == 0) {
-/* 108 */         if (!instalacion.instalacion()) {
-/* 109 */           JOptionPane.showMessageDialog(new Frame(), Mensajes.getString("instala4"));
+       if (confirma == 0) {
+         if (!instalacion.instalacion()) {
+           JOptionPane.showMessageDialog(new Frame(), Mensajes.getString("instala4"));
  
-/* 111 */           System.exit(0);
+           System.exit(0);
          }
-/* 113 */         DonacionesJDialog.recordarDonaciones();
+         DonacionesJDialog.recordarDonaciones();
        }
-/* 115 */     } else if (retorno == -2) {
-/* 116 */       JOptionPane.showMessageDialog(new Frame(), Mensajes.getString("errorSQLGeneral") + "\n" + instalacion.getError());
+     } else if (retorno == -2) {
+       JOptionPane.showMessageDialog(new Frame(), Mensajes.getString("errorSQLGeneral") + "\n" + instalacion.getError());
  
-/* 118 */       System.exit(0);
+       System.exit(0);
      }
    }
  
    private void checkVersion()
    {
-/* 124 */     String actualVersion = "2.5";
-/* 125 */     ArrayList array = new ArrayList();
-/* 126 */     ConfiguracionBean config = new ConfiguracionBean();
-/* 127 */     array = config.getConfig("<version>");
-/* 128 */     if (array.isEmpty()) {
-/* 129 */       array.add(actualVersion);
-/* 130 */       config.saveConfig("<version>", array);
+     String actualVersion = "2.5";
+     ArrayList array = new ArrayList();
+     ConfiguracionBean config = new ConfiguracionBean();
+     array = config.getConfig("<version>");
+     if (array.isEmpty()) {
+       array.add(actualVersion);
+       config.saveConfig("<version>", array);
      }
      else {
-/* 133 */       String anteriorVersion = (String)array.get(0);
-/* 134 */       if (!((String)array.get(0)).equals(actualVersion))
+       String anteriorVersion = (String)array.get(0);
+       if (!((String)array.get(0)).equals(actualVersion))
        {
-/* 136 */         array.clear();
-/* 137 */         array.add(actualVersion);
-/* 138 */         config.saveConfig("<version>", array);
+         array.clear();
+         array.add(actualVersion);
+         config.saveConfig("<version>", array);
        }
  
-/* 142 */       if (anteriorVersion.equals("2.1")) {
-/* 143 */         Instalar instalacion = new Instalar();
-/* 144 */         instalacion.de21a22();
+       if (anteriorVersion.equals("2.1")) {
+         Instalar instalacion = new Instalar();
+         instalacion.de21a22();
        }
-/* 146 */       if ((anteriorVersion.equals("2.0")) || (anteriorVersion.equals("2.1")) || (anteriorVersion.equals("2.2")) || (anteriorVersion.equals("2.3")) || (anteriorVersion.equals("2.4")))
+       if ((anteriorVersion.equals("2.0")) || (anteriorVersion.equals("2.1")) || (anteriorVersion.equals("2.2")) || (anteriorVersion.equals("2.3")) || (anteriorVersion.equals("2.4")))
        {
-/* 149 */         Instalar instalacion = new Instalar();
-/* 150 */         instalacion.de24a241();
+         Instalar instalacion = new Instalar();
+         instalacion.de24a241();
        }
-/* 152 */       if ((anteriorVersion.equals("2.0")) || (anteriorVersion.equals("2.1")) || (anteriorVersion.equals("2.2")) || (anteriorVersion.equals("2.3")) || (anteriorVersion.equals("2.4")) || (anteriorVersion.equals("2.4.1")))
+       if ((anteriorVersion.equals("2.0")) || (anteriorVersion.equals("2.1")) || (anteriorVersion.equals("2.2")) || (anteriorVersion.equals("2.3")) || (anteriorVersion.equals("2.4")) || (anteriorVersion.equals("2.4.1")))
        {
-/* 155 */         Instalar instalacion = new Instalar();
-/* 156 */         instalacion.de241a242();
+         Instalar instalacion = new Instalar();
+         instalacion.de241a242();
        }
-/* 158 */       if ((anteriorVersion.equals("2.0")) || (anteriorVersion.equals("2.1")) || (anteriorVersion.equals("2.2")) || (anteriorVersion.equals("2.3")) || (anteriorVersion.equals("2.4")) || (anteriorVersion.equals("2.4.1")) || (anteriorVersion.equals("2.4.2")) || (anteriorVersion.equals("2.4.3")) || (anteriorVersion.equals("2.4.4")))
+       if ((anteriorVersion.equals("2.0")) || (anteriorVersion.equals("2.1")) || (anteriorVersion.equals("2.2")) || (anteriorVersion.equals("2.3")) || (anteriorVersion.equals("2.4")) || (anteriorVersion.equals("2.4.1")) || (anteriorVersion.equals("2.4.2")) || (anteriorVersion.equals("2.4.3")) || (anteriorVersion.equals("2.4.4")))
        {
-/* 163 */         Instalar instalacion = new Instalar();
-/* 164 */         instalacion.de244a245();
+         Instalar instalacion = new Instalar();
+         instalacion.de244a245();
        }
      }
    }
  
    public static contaes.manejoDatos.auxiliar.MySQLConection getCEmpresa()
    {
-/* 171 */     return cEmpresa;
+     return cEmpresa;
    }
  
    public static void setCEmpresa(int empresa) {
-/* 175 */     if (cEmpresa != null) {
-/* 176 */       cEmpresa.cierraConexion();
+     if (cEmpresa != null) {
+       cEmpresa.cierraConexion();
      }
-/* 178 */     cEmpresa = new contaes.manejoDatos.auxiliar.MySQLConection(empresa);
+     cEmpresa = new contaes.manejoDatos.auxiliar.MySQLConection(empresa);
    }
  
    public static contaes.manejoDatos.auxiliar.MySQLConection getCFacturacion() {
-/* 182 */     return cFacturacion;
+     return cFacturacion;
    }
  
    public static void setCFacturacion(int empresa) {
-/* 186 */     if (cFacturacion != null) {
-/* 187 */       cFacturacion.cierraConexion();
+     if (cFacturacion != null) {
+       cFacturacion.cierraConexion();
      }
-/* 189 */     cFacturacion = new contaes.manejoDatos.auxiliar.MySQLConection(empresa);
+     cFacturacion = new contaes.manejoDatos.auxiliar.MySQLConection(empresa);
    }
  
    public static contaes.manejoDatos.auxiliar.MySQLConection getCGeneral() {
-/* 193 */     return cGeneral;
+     return cGeneral;
    }
  
    public static almacen2.data.MySQLConection getcAlmacen() {
-/* 197 */     return cAlmacen;
+     return cAlmacen;
    }
  
    public static JTree getArbolPGC() {
-/* 201 */     return arbolPC;
+     return arbolPC;
    }
  
    private void crearArbolPGC() {
-/* 205 */     ExecutorService exec = Executors.newSingleThreadExecutor();
-/* 206 */     exec.execute(new TreeCreator());
-/* 207 */     exec.shutdown();
+     ExecutorService exec = Executors.newSingleThreadExecutor();
+     exec.execute(new TreeCreator());
+     exec.shutdown();
    }
  
+   
+   // Esta funcion main es la que inicia todo el sistema
+   
    public static void main(String[] args)
    {
        final String[] opcion = args;
        SwingUtilities.invokeLater(new Runnable(){
            public void run() {
-           boolean POS = false;
-           int n = opcion.length;
-           if ((n > 0) && (opcion[0].equals("POS"))) {
-               POS = true;
-           }
-           try{
-/* 230 */           Properties sistema = System.getProperties();
- /* 231 */           String sisOp = sistema.getProperty("os.name").substring(0, 3);
-/* 232 */           if (sisOp.equals("Lin")) {
-/* 233 */             NimRODTheme nt = new NimRODTheme();
-/* 234 */             nt.setSecondary3(new Color(226, 216, 207));
- 
-/* 236 */             nt.setPrimary2(new Color(156, 100, 77));
-/* 237 */             nt.setPrimary3(new Color(189, 189, 189));
-/* 238 */             NimRODLookAndFeel NimRODLF = new NimRODLookAndFeel();
-/* 239 */             NimRODLookAndFeel.setCurrentTheme(nt);
- //JFrame.setDefaultLookAndFeelDecorated(true);
- 
- //aki iba NimRODLF
-/* 240 */        //     UIManager.setLookAndFeel(NimRODLF);
-UIManager.setLookAndFeel(UIManager.getDefaults().toString());
-  // UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-           }
-           else {
-/* 243 */           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-           }
-         } catch (ClassNotFoundException exc1) {
-/* 246 */           System.out.println(exc1.getMessage());
-         } catch (InstantiationException exc2) {
-/* 248 */           System.out.println(exc2.getMessage());
-         } catch (IllegalAccessException exc3) {
-/* 250 */           System.out.println(exc3.getMessage());
-         } catch (UnsupportedLookAndFeelException exc4) {
-/* 252 */           System.out.println(exc4.getMessage());
-         }
-/* 254 */         new Inicio(POS);
-       } } );
+                boolean POS = false;
+                int n = opcion.length;
+                if ((n > 0) && (opcion[0].equals("POS"))) {
+                    POS = true;
+                }
+                
+                try {
+                    Properties sistema = System.getProperties();
+                    String sisOp = sistema.getProperty("os.name").substring(0, 3);
+                    if (sisOp.equals("Lin")) {
+                        NimRODTheme nt = new NimRODTheme();
+                        nt.setSecondary3(new Color(226, 216, 207));
+
+                        nt.setPrimary2(new Color(156, 100, 77));
+                        nt.setPrimary3(new Color(189, 189, 189));
+                        NimRODLookAndFeel NimRODLF = new NimRODLookAndFeel();
+                        NimRODLookAndFeel.setCurrentTheme(nt);
+                        //JFrame.setDefaultLookAndFeelDecorated(true);
+
+                        //aki iba NimRODLF
+                        //     UIManager.setLookAndFeel(NimRODLF);
+                        UIManager.setLookAndFeel(UIManager.getDefaults().toString());
+                        // UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                    } else {
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    }
+                } catch (ClassNotFoundException exc1) {
+                  System.out.println(exc1.getMessage());
+                } catch (InstantiationException exc2) {
+                  System.out.println(exc2.getMessage());
+                } catch (IllegalAccessException exc3) {
+                  System.out.println(exc3.getMessage());
+                } catch (UnsupportedLookAndFeelException exc4) {
+                  System.out.println(exc4.getMessage());
+                }
+                
+                new Inicio(POS);
+            } 
+       });
    }
  
    class TreeCreator implements Runnable {
      TreeCreator() {
      }
  
-/* 262 */     public void run() { Inicio.arbolPC = new BuildPlanTree().getArbol(); }
+     public void run() { 
+         Inicio.arbolPC = new BuildPlanTree().getArbol();
+     }
  
    }
  }
 
-/* Location:           /media/sda1/contaes4/contaes4.jar
+/*/media/sda1/contaes4/contaes4.jar
  * Qualified Name:     contaes.Inicio
  * JD-Core Version:    0.6.2
  */
