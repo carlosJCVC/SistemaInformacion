@@ -750,7 +750,7 @@ public class MarcoInicio extends JFrame implements ActionListener
 
   private void crearMenu(JMenuBar menu)
   {
-    JMenu empresas = new JMenu(Mensajes.getString("ssssssssssssss"));
+    JMenu empresas = new JMenu(Mensajes.getString("menu1"));
     menu.add(empresas);
     JMenu diario = new JMenu(Mensajes.getString("diario"));
     menu.add(diario);
