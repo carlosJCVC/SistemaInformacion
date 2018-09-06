@@ -263,7 +263,7 @@ public class MarcoInicio extends JFrame implements ActionListener
           mostrarDialogo(dlg2);
           saveFirstStart();
           seleccionarEmpresa();
-        }
+          }
         else {
           System.exit(0);
         }
